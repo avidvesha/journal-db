@@ -29,7 +29,7 @@ class _LoginFormState extends State<LoginForm> {
                             MaterialPageRoute(builder: (context) => const FirstPage()),
                           );
                         },
-                          icon:  Image.asset('assets/icons/back_icon.png',
+                          icon:  Image.asset('assets/back_icon.png',
                             width: 100,),
                         ),
                         Padding(padding: EdgeInsets.all(5),

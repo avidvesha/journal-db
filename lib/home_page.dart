@@ -1,9 +1,14 @@
+import 'package:coffee_shop_youtube/choco.dart';
+import 'package:coffee_shop_youtube/tea.dart';
 import 'package:coffee_shop_youtube/widget/category.dart';
 import 'package:coffee_shop_youtube/widget/coffee_shop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'beverage.dart';
+import 'coffee.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,11 +22,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: BottomNavigationBar(items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-        BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: "Tersimpan"),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profil")
-      ]),
       body: SingleChildScrollView(
         child: SafeArea(
             child: Column(
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
             Stack(
               children: [
                 Container(
-                    height: 140, width: double.infinity, color: Colors.brown),
+                    height: 140, width: double.infinity, color: Color.fromRGBO(29, 29, 29, 1),),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
                           cursorHeight: 20,
                           autofocus: false,
                           decoration: InputDecoration(
-                              hintText: "Cari Toko Kofi Favoritmu",
+                              hintText: "Search",
                               prefixIcon: Icon(Icons.search),
                               border: OutlineInputBorder(
                                   borderSide:
@@ -105,42 +105,75 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: Row(
-                children: [
-                  Category(imagePath: "assets/tubruk.png", title: "Tubruk"),
-                  Category(imagePath: "assets/mesin.png", title: "Espresso"),
-                  Category(imagePath: "assets/cup.png", title: "Latte"),
-                  Category(imagePath: "assets/biji.png", title: "Biji"),
-                ],
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  children: [
+                    Category(imagePath: "assets/tubruk.png", title: "Tubruk"),
+                    Category(imagePath: "assets/mesin.png", title: "Espresso"),
+                    Category(imagePath: "assets/cup.png", title: "Latte"),
+                    Category(imagePath: "assets/biji.png", title: "Biji"),
+                  ],
+                ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(15),
               child: Text(
-                "Tempat Favorit ☕️",
+                "Category",
                 style: GoogleFonts.montserrat(
                     fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-            CoffeShop(
-              imagePath: "assets/coffee_1.jpg",
-              nameShop: "Aku Kopi",
-              rating: "4.8",
-              jamBuka: "10.00 - 23.00",
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ChocoPage()),
+                );
+              },
+              child: CoffeShop(
+                imagePath: "assets/choco.png",
+                nameShop: "Chocolate",
+              ),
             ),
-            CoffeShop(
-              imagePath: "assets/coffee_2.jpg",
-              nameShop: "Toko Kenanganku",
-              rating: "4.9",
-              jamBuka: "13.00 - 23.00",
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CoffeePage()),
+                );
+              },
+              child: CoffeShop(
+                imagePath: "assets/coffee4.png",
+                nameShop: "Coffee",
+              ),
             ),
-            CoffeShop(
-              imagePath: "assets/coffee_3.jpg",
-              nameShop: "Ketiga Kopi",
-              rating: "4.7",
-              jamBuka: "13.00 - 20.00",
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TeaPage()),
+                );
+              },
+              child: CoffeShop(
+                imagePath: "assets/tea.png",
+                nameShop: "Tea",
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BeveragePage()),
+                );
+              },
+              child: CoffeShop(
+                imagePath: "assets/beverage.png",
+                nameShop: "Beverage",
+              ),
             ),
           ],
         )),
