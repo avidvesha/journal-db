@@ -15,30 +15,32 @@ class _LoginFormState extends State<LoginForm> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Row(
-                      children: [
-                        IconButton(onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const FirstPage()),
-                          );
-                        },
-                          icon:  Image.asset('assets/back_icon.png',
-                            width: 100,),
-                        ),
-                        Padding(padding: EdgeInsets.all(5),
-                          child: Text('Back'),)
-                      ],
-                    ),
+          child: Center(
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Row(
+                    children: [
+                      IconButton(onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const FirstPage()),
+                        );
+                      },
+                        icon:  Image.asset('assets/back_icon.png',
+                          width: 150,),
+                      ),
+                      Padding(padding: EdgeInsets.all(5),
+                        child: Text('Back'),)
+                    ],
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height - 86,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // SizedBox(height: 50),
@@ -106,8 +108,8 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         )

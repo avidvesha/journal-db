@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'home_page.dart';
 import 'login_form.dart';
+import 'navbar.dart';
 import 'register_form.dart';
 
 class FirstPage extends StatefulWidget {
@@ -114,7 +115,7 @@ class _FirstPageState extends State<FirstPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const HomePage()),
+                              MaterialPageRoute(builder: (context) => const navbar()),
                             );
                           },
                           child: Text(

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "791562271607",
+    "project_id": "journal-5e0b3",
+    "storage_bucket": "journal-5e0b3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791562271607:android:0c29e13d6e43282d78bf72",
+        "android_client_info": {
+          "package_name": "com.example.coffee_shop_youtube"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "791562271607-ps14hm3b9upse0mhn1eh3ol414nc2otj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBK7r9HiyTymFfUDxb2j3dGb3y2FxOPr4I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "791562271607-ps14hm3b9upse0mhn1eh3ol414nc2otj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
