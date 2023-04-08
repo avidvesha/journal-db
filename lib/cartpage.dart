@@ -3,6 +3,9 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:journal_coffee/currencyFormat.dart';
+import 'package:journal_coffee/payment_method.dart';
+
+import 'payment_method.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({Key? key}) : super(key: key);
@@ -325,7 +328,10 @@ class _CartPageState extends State<CartPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PaymentMethod()),
+                    );
                 },
                 child: Text("Checkout"),
                 style: ElevatedButton.styleFrom(
