@@ -110,22 +110,22 @@ class _FirstPageState extends State<FirstPage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 10,),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const navbar()),
-                            );
-                          },
-                          child: Text(
-                            "Guest mode",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black
-                            ),
-                          ),)
+                        // SizedBox(height: 10,),
+                        // TextButton(
+                        //   onPressed: () {
+                        //     Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(builder: (context) => const navbar()),
+                        //     );
+                        //   },
+                        //   child: Text(
+                        //     "Guest mode",
+                        //     style: TextStyle(
+                        //         fontWeight: FontWeight.bold,
+                        //         fontSize: 16,
+                        //         color: Colors.black
+                        //     ),
+                        //   ),)
 
                       ],
                     ),

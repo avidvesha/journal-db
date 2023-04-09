@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'auth.dart';
 import 'first_page.dart';
+import 'home_page.dart';
+import 'navbar.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({Key? key}) : super(key: key);
@@ -10,6 +13,11 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
+
+  var emailCon = TextEditingController();
+  var passCon = TextEditingController();
+  var nameCon = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +62,7 @@ class _RegisterFormState extends State<RegisterForm> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 15),
                           child: TextField(
+                            controller: nameCon,
                             decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Name'
@@ -75,6 +84,7 @@ class _RegisterFormState extends State<RegisterForm> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 15),
                           child: TextField(
+                            controller: emailCon,
                             decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Email'
@@ -96,28 +106,7 @@ class _RegisterFormState extends State<RegisterForm> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 15),
                           child: TextField(
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Username'
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height:0),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            border: Border.all(
-                              color: Colors.white,
-                            ),
-                            borderRadius: BorderRadius.circular(15)
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: TextField(
+                            controller: passCon,
                             obscureText: true,
                             decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -137,8 +126,14 @@ class _RegisterFormState extends State<RegisterForm> {
                                 borderRadius: BorderRadius.circular(15)
                             )
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
+                        onPressed: () async {
+                          final message = await AuthService().registration(email: emailCon.text, password: passCon.text, username: nameCon.text);
+                          if (message!.contains('Success')) {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => navbar()));
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(message))
+                          );
                         },
                         child: Center(
                             child: Text("Register")

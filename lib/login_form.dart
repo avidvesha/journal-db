@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:journal_coffee/auth.dart';
+import 'package:journal_coffee/home_page.dart';
 
 import 'first_page.dart';
+import 'navbar.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -10,6 +13,10 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+
+  var emailCon = TextEditingController();
+  var passCon = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,9 +64,10 @@ class _LoginFormState extends State<LoginForm> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 15),
                             child: TextField(
+                              controller: emailCon,
                               decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Username'
+                                  hintText: 'Email'
                               ),
                             ),
                           ),
@@ -80,6 +88,7 @@ class _LoginFormState extends State<LoginForm> {
                             padding: const EdgeInsets.only(left: 15),
                             child: TextField(
                               obscureText: true,
+                              controller: passCon,
                               decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Password'
@@ -98,8 +107,14 @@ class _LoginFormState extends State<LoginForm> {
                                   borderRadius: BorderRadius.circular(15)
                               )
                           ),
-                          onPressed: () {
-                            Navigator.pop(context);
+                          onPressed: () async {
+                            final message = await AuthService().login(email: emailCon.text, password: passCon.text);
+                            if (message!.contains('Success')) {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => navbar()));
+                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(message))
+                            );
                           },
                           child: Center(
                               child: Text("Login")

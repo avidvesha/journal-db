@@ -1,8 +1,13 @@
 
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -13,18 +18,80 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
 
-  String? genders;
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+
   String? nama;
-  String? phones;
   String? emails;
   String? img_url;
 
   File? image;
   var namaController = TextEditingController();
   var emailController = TextEditingController();
-  var phoneController = TextEditingController();
-  var genderController = TextEditingController();
   bool isLoading = false;
+
+
+  Future<void> getData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var name = await FirebaseDatabase.instance.ref().child('user').child(userId).child('profile').child('username').get();
+    var email = await FirebaseDatabase.instance.ref().child('user').child(userId).child('profile').child('email').get();
+    var image_profile =
+    await FirebaseDatabase.instance.ref().child('user').child(userId).child('profile').child('images').get();
+
+    setState(() {
+      nama = name.value.toString();
+      emails = FirebaseAuth.instance.currentUser!.email;
+      img_url = image_profile.value.toString();
+    });
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future openCamera() async {
+    final pickedImage =
+    await ImagePicker().pickImage(source: ImageSource.camera);
+    image = File(pickedImage!.path);
+    setState(() {
+      image = File(pickedImage!.path);
+    });
+    uploadFotoProfile();
+  }
+
+  Future openGaleri() async {
+    final pickedImage =
+    await ImagePicker().pickImage(source: ImageSource.gallery);
+    setState(() {
+      image = File(pickedImage!.path);
+    });
+    uploadFotoProfile();
+  }
+
+  Future uploadFotoProfile() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    String fileName = basename(image!.path);
+    await FirebaseStorage.instance.ref()
+        .child('profile/$userId/$fileName')
+        .putFile(image!);
+    var url = await FirebaseStorage.instance.ref().child(
+        'profile/$userId/$fileName').getDownloadURL();
+    setState(() {
+      img_url = url.toString();
+    });
+
+    await FirebaseDatabase.instance.ref().child('user').child(userId).child('profile').child('images').set(img_url);
+  }
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +111,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-              // onPressed: () => FirebaseAuth.instance.signOut(),
-            onPressed: () {},
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pop(context);
+                },
+
+            // onPressed: () {},
               icon: Icon(
                 Icons.logout,
                 color: Colors.black,
@@ -111,6 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       children: [
                                         ElevatedButton(
                                             onPressed: () {
+                                              openCamera();
                                               Navigator.pop(context);
                                             },
                                             child: Icon(
@@ -133,6 +205,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                         ElevatedButton(
                                             onPressed: () {
+                                              openGaleri();
                                               Navigator.pop(context);
                                             },
                                             child: Icon(
@@ -197,34 +270,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Divider(
                   height: 1,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Gender",
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    SizedBox(
-                      child: Row(
-                        children: [
-                          Text(
-                            genders ?? "Your Gender",
-                            style: TextStyle(fontSize: 15),
-                          ),
-                          IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                CupertinoIcons.right_chevron,
-                                size: 15,
-                              ))
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Divider(
-                  height: 1,
-                ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -257,35 +303,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 1,
                   thickness: 0.8,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Phone",
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    SizedBox(
-                      child: Row(
-                        children: [
-                          Text(
-                            phones ?? "Your Phone",
-                            style: TextStyle(fontSize: 15),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                              },
-                              icon: Icon(
-                                CupertinoIcons.right_chevron,
-                                size: 15,
-                              ))
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Divider(
-                  height: 1,
-                ),
+
 
               ],
             ),

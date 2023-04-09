@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:journal_coffee/currencyFormat.dart';
 import 'package:journal_coffee/payment_method.dart';
 
+import 'cartItem.dart';
 import 'payment_method.dart';
 
 class CartPage extends StatefulWidget {
@@ -16,10 +18,37 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
 
-  final DatabaseCart = FirebaseDatabase.instance.ref().child('user').child('cart');
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+
+  final DatabaseCart = FirebaseDatabase.instance.ref().child('user');
 
   int total = 0;
-  int subtotal = 0;
+
+  List<CartItem> cartList = [];
+  List<String> cartKeys = [];
+
+
+
+  Future<void> getData() async {
+    DatabaseCart.child(userId).child('cart').onValue.listen((event) {
+      cartList.clear();
+      cartKeys.clear();
+      total=0;
+      setState(() {
+        var cartValue = event.snapshot.value;
+        print(cartValue);
+        if (cartValue != null && cartValue is Map) {
+          cartValue.forEach((key, value) {
+            var cartItem = CartItem.fromJson(value);
+            cartKeys.add(key.toString());
+            cartList.add(cartItem);
+            total += cartItem.harga! * cartItem.jumlah!;
+          });
+        }
+        print(cartList);
+      });
+    });
+  }
 
   void alert(BuildContext context, {required key}) {
     AlertDialog alert = AlertDialog(
@@ -37,7 +66,7 @@ class _CartPageState extends State<CartPage> {
         TextButton(
           child: Text('Iya'),
           onPressed: () {
-            DatabaseCart.child(key).remove();
+            DatabaseCart.child(userId).child('cart').child(key).remove();
             Navigator.of(context).pop();
           },
         ),
@@ -48,11 +77,14 @@ class _CartPageState extends State<CartPage> {
     return;
   }
 
-  updateTotal() {
-    setState(() {
-      total = subtotal + 20000;
-    });
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,184 +110,163 @@ class _CartPageState extends State<CartPage> {
             children: [
               Container(
                 margin: EdgeInsets.only(bottom: 10),
-                height: 410,
-                child: FirebaseAnimatedList(
-                  query: DatabaseCart,
-                  defaultChild: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  itemBuilder: (context, snapshot, animation, index) {
-                    Map cart = snapshot.value as Map;
-                    cart['key'] = snapshot.key;
+                width: double.infinity,
+                height: 500,
+                child: ListView.builder(
+                    itemCount: cartList.length,
+                    itemBuilder: (context, index) {
+                  return Container(
+                    height: 130,
+                    child: Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 20),
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.black),
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              Icons.check_outlined,
+                              size: 12,
+                              color: Colors.white,
+                            ),
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.only(right: 0),
+                          ),
+                        ),
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                              color: Color(0xffededed),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Image.network(
+                            cartList[index].image.toString(),
+                            fit: BoxFit.cover,
 
-                    var namaProduct = cart['nama_product'];
-                    var brand = cart['brand'];
-                    var ukuran = cart['ukuran'];
-                    var jumlah = cart['jumlah'];
-                    var image = cart['image'];
-                    var harga = cart['harga'];
-                    int totalHarga = harga * jumlah;
-
-                    subtotal += totalHarga;
-
-                    return Container(
-                      height: 130,
-                      child: Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(right: 20),
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.black),
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.check_outlined,
-                                size: 12,
-                                color: Colors.white,
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 13),
+                          width: 140,
+                          height: 100,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                cartList[index].nama_produk.toString(),
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0x9c9c9c9c),
+                                    height: 1.6),
                               ),
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.only(right: 0),
-                            ),
-                          ),
-                          Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                                color: Color(0xffededed),
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Image.network(
-                              image,
-                              fit: BoxFit.fitWidth,
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(left: 13),
-                            width: 140,
-                            height: 100,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  brand,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
-                                ),
-                                Text(
-                                  namaProduct,
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0x9c9c9c9c),
-                                      height: 1.6),
-                                ),
-                                Text(
-                                  CurrencyFormat.convertToIdr(totalHarga, 2),
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.red,
-                                      height: 1.5,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(
-                                  height: 9,
-                                ),
-                                Container(
-                                  width: 90,
-                                  height: 30,
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 30,
-                                        height: 30,
-                                        child: IconButton(
+                              Text(
+                                CurrencyFormat.convertToIdr(((cartList[index].harga!)*(cartList[index].jumlah!)), 2),
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.red,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 9,
+                              ),
+                              Container(
+                                width: 90,
+                                height: 30,
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 30,
+                                      height: 30,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          if (cartList[index].jumlah == 1) {
+                                            alert(context, key: cartKeys[index]);
+                                          } else {
+                                            DatabaseCart.child(userId).child('cart').child(cartKeys[index])
+                                                .child('jumlah')
+                                                .set(cartList[index].jumlah! - 1);
+                                          }
+                                          // setState(() {
+                                          //   if (totalHarga != 0) {
+                                          //     subtotal = totalHarga - harga as int;
+                                          //   } else {
+                                          //     subtotal = 0;
+                                          //   }
+                                          // });
+                                          // updateTotal();
+                                        },
+                                        icon: Icon(
+                                          CupertinoIcons.minus_circle,
+                                          color: Color(0x9c9c9c9c),
+                                          size: 20,
+                                        ),
+                                        alignment:
+                                        AlignmentDirectional.centerStart,
+                                        padding: EdgeInsets.only(right: 5),
+                                      ),
+                                    ),
+                                    Text(cartList[index].jumlah.toString()),
+                                    SizedBox(
+                                      width: 30,
+                                      height: 30,
+                                      child: IconButton(
                                           onPressed: () {
-                                            if (jumlah == 1) {
-                                              alert(context, key: cart['key']);
-                                            } else {
-                                              DatabaseCart.child(cart['key'])
-                                                  .child('jumlah')
-                                                  .set(jumlah - 1);
-                                            }
-                                            setState(() {
-                                              if (totalHarga != 0) {
-                                                subtotal = totalHarga - harga as int;
-                                              } else {
-                                                subtotal = 0;
-                                              }
-                                            });
-                                            updateTotal();
+                                            DatabaseCart.child(userId).child('cart').child(cartKeys[index])
+                                                .child('jumlah')
+                                                .set(cartList[index].jumlah! + 1);
+                                            // setState(() {
+                                            //   subtotal = totalHarga + harga as int;
+                                            // });
+                                            // updateTotal();
                                           },
                                           icon: Icon(
-                                            CupertinoIcons.minus_circle,
+                                            CupertinoIcons.add_circled,
                                             color: Color(0x9c9c9c9c),
                                             size: 20,
                                           ),
                                           alignment:
-                                          AlignmentDirectional.centerStart,
-                                          padding: EdgeInsets.only(right: 5),
-                                        ),
-                                      ),
-                                      Text(jumlah.toString()),
-                                      SizedBox(
-                                        width: 30,
-                                        height: 30,
-                                        child: IconButton(
-                                            onPressed: () {
-                                              DatabaseCart.child(cart['key'])
-                                                  .child('jumlah')
-                                                  .set(jumlah + 1);
-                                              setState(() {
-                                                subtotal = totalHarga + harga as int;
-                                              });
-                                              updateTotal();
-                                            },
-                                            icon: Icon(
-                                              CupertinoIcons.add_circled,
-                                              color: Color(0x9c9c9c9c),
-                                              size: 20,
-                                            ),
-                                            alignment:
-                                            AlignmentDirectional.centerEnd,
-                                            padding: EdgeInsets.only(left: 5)),
-                                      )
-                                    ],
-                                  ),
+                                          AlignmentDirectional.centerEnd,
+                                          padding: EdgeInsets.only(left: 5)),
+                                    )
+                                  ],
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 50,
+                          height: 90,
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Color(0xffededed),
+                                borderRadius: BorderRadius.circular(5)),
+                            width: 20,
+                            height: 20,
+                            child: IconButton(
+                              onPressed: () {
+                                alert(context, key: cartKeys[index]);
+                              },
+                              icon: Icon(
+                                Icons.delete,
+                                size: 13,
+                                color: Color(0xffBBBBBB),
+                              ),
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.zero,
                             ),
                           ),
-                          Container(
-                            width: 50,
-                            height: 90,
-                            alignment: Alignment.bottomRight,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Color(0xffededed),
-                                  borderRadius: BorderRadius.circular(5)),
-                              width: 20,
-                              height: 20,
-                              child: IconButton(
-                                onPressed: () {
-                                  alert(context, key: cart['key']);
-                                },
-                                icon: Icon(
-                                  Icons.delete,
-                                  size: 13,
-                                  color: Color(0xffBBBBBB),
-                                ),
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.zero,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                        )
+                      ],
+                    ),
+                  );
+                })
               ),
               Text(
                 "-----------------------------",
@@ -275,7 +286,7 @@ class _CartPageState extends State<CartPage> {
                         height: 2, color: Color(0x9c9c9c9c), fontSize: 13),
                   ),
                   Text(
-                    CurrencyFormat.convertToIdr(subtotal, 2),
+                    CurrencyFormat.convertToIdr(total, 2),
                     style: TextStyle(
                         height: 2,
                         color: Colors.black,
@@ -284,24 +295,24 @@ class _CartPageState extends State<CartPage> {
                   )
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Shipping Cost",
-                    style: TextStyle(
-                        height: 2, color: Color(0x9c9c9c9c), fontSize: 13),
-                  ),
-                  Text(
-                    "+Rp 20.000",
-                    style: TextStyle(
-                        height: 2,
-                        color: Colors.black,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold),
-                  )
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Text(
+              //       "Shipping Cost",
+              //       style: TextStyle(
+              //           height: 2, color: Color(0x9c9c9c9c), fontSize: 13),
+              //     ),
+              //     Text(
+              //       "+Rp 20.000",
+              //       style: TextStyle(
+              //           height: 2,
+              //           color: Colors.black,
+              //           fontSize: 13,
+              //           fontWeight: FontWeight.bold),
+              //     )
+              //   ],
+              // ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
